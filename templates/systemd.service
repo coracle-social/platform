@@ -1,0 +1,19 @@
+[Unit]
+Description=relay.SUBDOMAIN.coracle.tools
+ConditionPathExists=/home/SUBDOMAIN/triflector
+After=network.target
+
+[Service]
+Type=simple
+User=SUBDOMAIN
+Group=SUBDOMAIN
+WorkingDirectory=/home/SUBDOMAIN/triflector
+ExecStart=/usr/local/go/bin/go run .
+Restart=on-failure
+RestartSec=10
+StandardOutput=syslog
+StandardError=syslog
+SyslogIdentifier=SUBDOMAIN-relay
+
+[Install]
+WantedBy=multi-user.target
