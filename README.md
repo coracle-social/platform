@@ -2,7 +2,7 @@ To set up a new vm:
 
 ```sh
 apt update
-apt install nginx git kakoune golang certbot python3-certbot-nginx
+apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3
 
 # Install Go
 wget https://go.dev/dl/go1.21.7.linux-amd64.tar.gz
@@ -39,15 +39,20 @@ adduser $SUBDOMAIN
 # Log in as user
 su $SUBDOMAIN && cd ~
 
-# Install bun, clone repos
-curl -fsSL https://bun.sh/install | bash
+# Install nvm, yarn, clone repos
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+npm install --global yarn
+
+# Clone repos
 git clone https://github.com/coracle-social/coracle.git
 git clone https://github.com/coracle-social/triflector.git
 
 # Set up coracle
 cd ~/coracle
-bun install
-NODE_OPTIONS=--max_old_space_size=16384 bun run build
+nvm install
+nvm use
+yarn
+NODE_OPTIONS=--max_old_space_size=16384 yarn build
 
 # Set up triflector
 cd ~/triflector
