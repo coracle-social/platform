@@ -2,7 +2,7 @@ To set up a new vm:
 
 ```sh
 apt update
-apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3
+apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3 ack
 
 # Install Go
 wget https://go.dev/dl/go1.21.7.linux-amd64.tar.gz
