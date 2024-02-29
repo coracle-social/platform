@@ -1,6 +1,14 @@
 To set up a new vm:
 
 ```sh
+# Set up swap
+fallocate -l 1G /swapfile
+chmod 600 /swapfile
+mkswap /swapfile
+swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Install deps
 apt update
 apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3 ack
 
@@ -21,18 +29,10 @@ rm /etc/nginx/sites-enabled/default
 To set up a new service:
 
 ```sh
-SUBDOMAIN=YOUR_SUBDOMAIN_HERE
-PASSWORD=YOUR_PASSWORD_HERE
-PORT=YOUR_PORT_HERE
+SUBDOMAIN=nostrainsley
+PORT=5001
 
 # First, set up DNS for both relay.$SUBDOMAIN and $SUBDOMAIN, otherwise certbot will fail
-
-# Set up swap
-fallocate -l 1G /swapfile
-chmod 600 /swapfile
-mkswap /swapfile
-swapon /swapfile
-echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 # Add user
 adduser $SUBDOMAIN
@@ -55,12 +55,16 @@ nvm install
 nvm use
 npm install --global yarn
 yarn
+echo "VITE_FORCE_RELAYS=wss://relay.$SUBDOMAIN.coracle.tools" >> .env.local
 NODE_OPTIONS=--max_old_space_size=16384 yarn build
 
 # Set up triflector
 cd ~/triflector
 go get
 echo "PORT=$PORT" >> .env
+
+# Back to root
+exit
 
 # Nginx
 cat /root/platform/templates/nginx.conf \
@@ -69,14 +73,12 @@ cat /root/platform/templates/nginx.conf \
   > /etc/nginx/sites-available/$SUBDOMAIN.coracle.tools
 
 # Certbot
-certbot --nginx -d $SUBDOMAIN.coracle.tools -d relay.$SUBDOMAIN.coracle.tools
+certbot --nginx -d $SUBDOMAIN.coracle.tools
+certbot --nginx -d relay.$SUBDOMAIN.coracle.tools
 
 # Enable the site and restart nginx
 ln -s /etc/nginx/sites-{available,enabled}/$SUBDOMAIN.coracle.tools
 service nginx restart
-
-# Back to root
-exit
 
 # Systemd
 cat /root/platform/templates/systemd.service | sed s/SUBDOMAIN/$SUBDOMAIN/g > /etc/systemd/system/$SUBDOMAIN-relay.service
