@@ -10,7 +10,7 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 
 # Install deps
 apt update
-apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3 ack
+apt install nginx git kakoune golang certbot python3-certbot-nginx sqlite3 ack rsync postgresql postgresql-contrib
 
 # Install Go
 wget https://go.dev/dl/go1.21.7.linux-amd64.tar.gz
@@ -29,16 +29,21 @@ rm /etc/nginx/sites-enabled/default
 To set up a new service:
 
 ```sh
-SUBDOMAIN=nostrainsley
-PORT=5001
+PORT=5002
+SUBDOMAIN=hodlbod
 
 # First, set up DNS for both relay.$SUBDOMAIN and $SUBDOMAIN, otherwise certbot will fail
 
 # Add user
 adduser $SUBDOMAIN
+echo $SUBDOMAIN:$PASSWORD | chpasswd
+
+# Create database
+sudo -u postgres createdb $SUBDOMAIN;
+sudo -u postgres psql -c "CREATE USER \"$SUBDOMAIN\" WITH PASSWORD '$PASSWORD';"
 
 # Log in as user
-su $SUBDOMAIN
+SUBDOMAIN=$SUBDOMAIN PASSWORD=$PASSWORD PORT=$PORT su $SUBDOMAIN
 cd ~
 
 # Install nvm, yarn, clone repos
@@ -62,6 +67,7 @@ NODE_OPTIONS=--max_old_space_size=16384 yarn build
 cd ~/triflector
 go get
 echo "PORT=$PORT" >> .env
+echo "DATABASE_URL=postgres://$SUBDOMAIN:$PASSWORD@localhost:5432/$SUBDOMAIN?sslmode=disable" >> .env
 
 # Back to root
 exit
