@@ -29,8 +29,9 @@ rm /etc/nginx/sites-enabled/default
 To set up a new service:
 
 ```sh
-PORT=5002
-SUBDOMAIN=hodlbod
+PORT=5001
+SUBDOMAIN=mysubdomain
+PASSWORD=$(head -c18 /dev/urandom | base64)
 
 # First, set up DNS for both relay.$SUBDOMAIN and $SUBDOMAIN, otherwise certbot will fail
 
@@ -44,6 +45,8 @@ sudo -u postgres psql -c "CREATE USER \"$SUBDOMAIN\" WITH PASSWORD '$PASSWORD';"
 
 # Log in as user
 SUBDOMAIN=$SUBDOMAIN PASSWORD=$PASSWORD PORT=$PORT su $SUBDOMAIN
+
+# Go to home dir
 cd ~
 
 # Install nvm, yarn, clone repos
@@ -58,10 +61,9 @@ git clone https://github.com/coracle-social/triflector.git
 cd ~/coracle
 nvm install
 nvm use
-npm install --global yarn
-yarn
-echo "VITE_FORCE_RELAYS=wss://relay.$SUBDOMAIN.coracle.tools" >> .env.local
-NODE_OPTIONS=--max_old_space_size=16384 yarn build
+echo "VITE_PLATFORM_RELAYS=wss://relay.$SUBDOMAIN.coracle.tools" >> .env.local
+npm i
+NODE_OPTIONS=--max_old_space_size=16384 npm run build
 
 # Set up triflector
 cd ~/triflector
