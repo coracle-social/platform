@@ -92,3 +92,22 @@ service nginx restart
 cat /root/platform/templates/systemd.service | sed s/SUBDOMAIN/$SUBDOMAIN/g > /etc/systemd/system/$SUBDOMAIN-relay.service
 service $SUBDOMAIN-relay start
 ```
+
+To remove a service:
+
+```sh
+SUBDOMAIN=mysubdomain
+
+service $SUBDOMAIN-relay stop
+rm /etc/systemd/system/$SUBDOMAIN-relay.service
+
+rm /etc/nginx/sites-enabled/$SUBDOMAIN.coracle.tools
+rm /etc/nginx/sites-available/$SUBDOMAIN.coracle.tools
+service nginx restart
+
+sudo -u postgres dropdb $SUBDOMAIN;
+sudo -u postgres psql -c "DROP USER IF EXISTS \"$SUBDOMAIN\";"
+
+rm -rf /home/$SUBDOMAIN
+userdel $SUBDOMAIN
+```
