@@ -70,6 +70,7 @@ cd ~/triflector
 go get
 echo "PORT=$PORT" >> .env
 echo "DATABASE_URL=postgres://$SUBDOMAIN:$PASSWORD@localhost:5432/$SUBDOMAIN?sslmode=disable" >> .env
+go build .
 
 # Back to root
 exit
