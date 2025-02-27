@@ -1,19 +1,19 @@
 [Unit]
-Description=relay.SUBDOMAIN.coracle.tools
-ConditionPathExists=/home/SUBDOMAIN/triflector
+Description=DOMAIN
+ConditionPathExists=RELAY_PATH
 After=network.target
 
 [Service]
 Type=simple
-User=SUBDOMAIN
-Group=SUBDOMAIN
-WorkingDirectory=/home/SUBDOMAIN/triflector
-ExecStart=/home/SUBDOMAIN/triflector/triflector
+User=USERNAME
+Group=USERNAME
+WorkingDirectory=RELAY_PATH
+ExecStart=RELAY_PATH/triflector
 Restart=always
 RuntimeMaxSec=3600
 StandardOutput=syslog
 StandardError=syslog
-SyslogIdentifier=SUBDOMAIN-relay
+SyslogIdentifier=RELAY_SERVICE
 
 [Install]
 WantedBy=multi-user.target
